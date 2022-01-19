@@ -99,7 +99,8 @@ const data = {
       x: 300,
       y: 600
     },
-    scrollAutoMove: 0
+    scrollAutoMove: 0,
+    mobileY: 0
   },
   mutations: {
     ...animation.mutations,
@@ -375,6 +376,9 @@ const data = {
     },
     setScrollAutoMove(state, offset) {
       state.scrollAutoMove = offset
+    },
+    setMobileY(state, y) {
+      state.mobileY = y
     }
   },
   modules: {

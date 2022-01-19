@@ -371,7 +371,6 @@ export default {
       mouseOn: false,
       // 是否移动 （如果没有移动 不需要记录snapshot）
       hasMove: false,
-      mouseEvent: null
     }
   },
   computed: {
@@ -649,7 +648,6 @@ export default {
       if (this.enabled) {
         this.curComponent.optStatus.dragging = val
         this.$store.commit('setScrollAutoMove', 0)
-        // console.log('scrollAutoMove-cancel：' + this.scrollAutoMove)
       }
     },
     // private 监控dragging  resizing
@@ -657,15 +655,6 @@ export default {
       if (this.enabled) {
         this.curComponent.optStatus.resizing = val
         this.$store.commit('setScrollAutoMove', 0)
-        // console.log('scrollAutoMove-cancel：' + this.scrollAutoMove)
-
-      }
-    },
-    // 监控是否出现自动滑动
-    scrollAutoMove(value) {
-      // console.log('scrollAutoMove:' + value)
-      if (value > 0 && this.mouseEvent) {
-        this.handleDrag(this.mouseEvent)
       }
     }
   },
@@ -967,7 +956,6 @@ export default {
     },
     // 移动
     move(e) {
-      this.mouseEvent = e
       if (this.resizing) {
         this.handleResize(e)
       } else if (this.dragging) {
@@ -1012,7 +1000,10 @@ export default {
       // 水平移动
       const tmpDeltaX = axis && axis !== 'y' ? mouseClickPosition.mouseX - (e.touches ? e.touches[0].pageX : e.pageX) : 0
       // 垂直移动
-      const tmpDeltaY = axis && axis !== 'x' ? mouseClickPosition.mouseY - (e.touches ? e.touches[0].pageY : e.pageY) : 0
+      // 当前鼠标指针所在位置
+      const my = e.touches ? e.touches[0].pageY : e.pageY
+      this.$store.commit('setMobileY', my)
+      const tmpDeltaY = axis && axis !== 'x' ? mouseClickPosition.mouseY - my : 0
       const [deltaX, deltaY] = snapToGrid(grid, tmpDeltaX, tmpDeltaY, this.scaleRatio)
       const left = restrictToBounds(mouseClickPosition.left - deltaX, bounds.minLeft, bounds.maxLeft)
       const top = restrictToBounds(mouseClickPosition.top - deltaY, bounds.minTop, bounds.maxTop)

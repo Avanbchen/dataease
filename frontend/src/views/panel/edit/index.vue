@@ -318,7 +318,7 @@ export default {
       ],
       enableSureButton: false,
       filterFromDrag: false,
-      autoMoveOffSet: 5
+      autoMoveOffSet: 10
     }
   },
 
@@ -391,23 +391,22 @@ export default {
     // 计算是否接触上下边界
     attackBoundary() {
       let result = 'none'
-      if (this.curComponent && this.curComponent.optStatus.dragging) {
-        const curTop = this.curComponent.style.top * this.curCanvasScale.scalePointHeight
-        // 当前组件底部高度
-        const curBottom = (curTop + this.curComponent.style.height * this.curCanvasScale.scalePointHeight)
-        const screenBottom = this.scrollTop + this.outStyle.height
-
-        if ((curBottom) > screenBottom) {
-          // 触底
-          result = 'toBottom'
-        } else if (curTop + this.autoMoveOffSet < this.scrollTop) {
-          // 触顶
-          result = 'toTop'
-        } else {
-          result = 'none'
-        }
-        console.log('result:' + result + ';curTop:' + curTop + ';curBottom:' + curBottom + ';screenBottom:' + screenBottom + ';scrollTop:' + this.scrollTop + ';this.outStyle.height:' + this.outStyle.height)
-      }
+      // const canvasTop = 150
+      // const canvasHeight = 500
+      // const canvasBottom = canvasTop + canvasHeight
+      // // console.log('this.mobileY=' + this.mobileY)
+      // if (this.curComponent && this.curComponent.optStatus.dragging) {
+      //   if (this.mobileY > canvasBottom) {
+      //     // 触底
+      //     result = 'toBottom'
+      //   } else if (this.mobileY < canvasTop) {
+      //     // 触顶
+      //     result = 'toTop'
+      //   } else {
+      //     result = 'none'
+      //   }
+      //   // console.log('result:' + result + ';curTop:' + this.mobileY + ';canvasBottom:' + canvasBottom + ';canvasBottom:' + canvasBottom + ';scrollTop:' + this.scrollTop + ';this.outStyle.height:' + this.outStyle.height)
+      // }
       return result
     },
     ...mapState([
@@ -424,7 +423,8 @@ export default {
       'pcMatrixCount',
       'mobileMatrixCount',
       'mobileLayoutStyle',
-      'scrollAutoMove'
+      'scrollAutoMove',
+      'mobileY'
     ])
   },
 
@@ -450,16 +450,18 @@ export default {
     },
     mobileLayoutStatus(value) {
       this.restore()
-    },
-    attackBoundary(value) {
-      // console.log('attackBoundary:' + value)
-      this.destroyTimer()
-      if (this.mobileLayoutStatus && this.curComponent && this.curComponent.optStatus.dragging) {
-        if (value === 'toBottom') {
-          this.scrollMove()
-        }
-      }
     }
+    // ,
+    // attackBoundary(value) {
+    //   // console.log('attackBoundary-watch:' + value)
+    //   // this.destroyTimer()
+    //   if (this.mobileLayoutStatus && this.curComponent && this.curComponent.optStatus.dragging && value !== 'none') {
+    //     const autoMoveOffSetExec = value === 'toBottom' ? this.autoMoveOffSet : -this.autoMoveOffSet
+    //     this.scrollMove(autoMoveOffSetExec)
+    //   } else {
+    //     this.destroyTimer()
+    //   }
+    // }
   },
   created() {
     this.init(this.$store.state.panel.panelInfo.id)
@@ -919,27 +921,31 @@ export default {
     sureStatusChange(status) {
       this.enableSureButton = status
     },
-    scrollMove() {
+    scrollMove(offset) {
       const _this = this
       // 获取父盒子（肯定有滚动条）
       const canvasInfoMobile = document.getElementById('canvasInfoMobile')
       // 获取子盒子（高度肯定比父盒子大）
       const editorMobile = document.getElementById('editorMobile')
+      // console.log('scrollMove-offset...' + offset + ';canvasInfoMobile.scrollTop=' + canvasInfoMobile.scrollTop)
+
       this.timer = setInterval(function() {
         if (canvasInfoMobile.offsetHeight + canvasInfoMobile.scrollTop >= editorMobile.scrollHeight) {
           console.log('触底...')
-          // canvasInfoMobile.scrollTop = 0
-          // _this.$store.commit('setScrollAutoMove', 0)
+          _this.destroyTimer()
+        } else if (offset < 0 && canvasInfoMobile.scrollTop <= 0) {
+          console.log('触顶...')
           _this.destroyTimer()
         } else {
+          // console.log('offset...' + offset)
           // 如果存在网页缩放，很有可能没有效果，但是else部分的代码会执行
           // 原因：刚才讲到的scrollTop三个注意中标黄的一条
           // 设置scrollTop的值小于0，即scrollTop被设为0
           // 可以缩放跑一下，然后不刷新的状态下恢复百分之百跑一下，再缩放，打印scrollTop的值
           // 你会发现正常尺寸执行时打印的第一个值不是加法，而是减法，即scrollTop++增加负值
           // 这样的话就对应上了scrollTop的注意点了，增加的值小于0，就被设为0
-          canvasInfoMobile.scrollTop = canvasInfoMobile.scrollTop + 10
-          _this.$store.commit('setScrollAutoMove', _this.scrollAutoMove + 10)
+          canvasInfoMobile.scrollTop = canvasInfoMobile.scrollTop + offset
+          _this.$store.commit('setScrollAutoMove', _this.scrollAutoMove + offset)
         }
       }, 20)
     },
