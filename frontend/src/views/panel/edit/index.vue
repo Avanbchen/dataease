@@ -391,22 +391,22 @@ export default {
     // 计算是否接触上下边界
     attackBoundary() {
       let result = 'none'
-      // const canvasTop = 150
-      // const canvasHeight = 500
-      // const canvasBottom = canvasTop + canvasHeight
-      // // console.log('this.mobileY=' + this.mobileY)
-      // if (this.curComponent && this.curComponent.optStatus.dragging) {
-      //   if (this.mobileY > canvasBottom) {
-      //     // 触底
-      //     result = 'toBottom'
-      //   } else if (this.mobileY < canvasTop) {
-      //     // 触顶
-      //     result = 'toTop'
-      //   } else {
-      //     result = 'none'
-      //   }
-      //   // console.log('result:' + result + ';curTop:' + this.mobileY + ';canvasBottom:' + canvasBottom + ';canvasBottom:' + canvasBottom + ';scrollTop:' + this.scrollTop + ';this.outStyle.height:' + this.outStyle.height)
-      // }
+      const canvasTop = 150
+      const canvasHeight = 500
+      const canvasBottom = canvasTop + canvasHeight
+      // console.log('this.mobileY=' + this.mobileY)
+      if (this.curComponent && this.curComponent.optStatus.dragging) {
+        if (this.mobileY > canvasBottom) {
+          // 触底
+          result = 'toBottom'
+        } else if (this.mobileY < canvasTop) {
+          // 触顶
+          result = 'toTop'
+        } else {
+          result = 'none'
+        }
+        // console.log('result:' + result + ';curTop:' + this.mobileY + ';canvasBottom:' + canvasBottom + ';canvasBottom:' + canvasBottom + ';scrollTop:' + this.scrollTop + ';this.outStyle.height:' + this.outStyle.height)
+      }
       return result
     },
     ...mapState([
@@ -450,18 +450,17 @@ export default {
     },
     mobileLayoutStatus(value) {
       this.restore()
+    },
+    attackBoundary(value) {
+      // console.log('attackBoundary-watch:' + value)
+      // this.destroyTimer()
+      if (this.mobileLayoutStatus && this.curComponent && this.curComponent.optStatus.dragging && value !== 'none') {
+        const autoMoveOffSetExec = value === 'toBottom' ? this.autoMoveOffSet : -this.autoMoveOffSet
+        this.scrollMove(autoMoveOffSetExec)
+      } else {
+        this.destroyTimer()
+      }
     }
-    // ,
-    // attackBoundary(value) {
-    //   // console.log('attackBoundary-watch:' + value)
-    //   // this.destroyTimer()
-    //   if (this.mobileLayoutStatus && this.curComponent && this.curComponent.optStatus.dragging && value !== 'none') {
-    //     const autoMoveOffSetExec = value === 'toBottom' ? this.autoMoveOffSet : -this.autoMoveOffSet
-    //     this.scrollMove(autoMoveOffSetExec)
-    //   } else {
-    //     this.destroyTimer()
-    //   }
-    // }
   },
   created() {
     this.init(this.$store.state.panel.panelInfo.id)
