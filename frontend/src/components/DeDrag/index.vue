@@ -370,7 +370,7 @@ export default {
       // 鼠标移入事件
       mouseOn: false,
       // 是否移动 （如果没有移动 不需要记录snapshot）
-      hasMove: false,
+      hasMove: false
     }
   },
   computed: {
@@ -544,7 +544,9 @@ export default {
       'linkageSettingStatus',
       'mobileLayoutStatus',
       'componentGap',
-      'scrollAutoMove'
+      'scrollAutoMove',
+      'mobileY',
+      'mobileX'
     ])
   },
   watch: {
@@ -656,6 +658,10 @@ export default {
         this.curComponent.optStatus.resizing = val
         this.$store.commit('setScrollAutoMove', 0)
       }
+    },
+    // 当自动移动出现变化时
+    scrollAutoMove(val) {
+      // this.handleDrag()
     }
   },
   created: function() {
@@ -727,6 +733,8 @@ export default {
       // 此处阻止冒泡 但是外层需要获取pageX pageY
       this.element.auxiliaryMatrix && this.$emit('elementMouseDown', e)
       this.$store.commit('setCurComponent', { component: this.element, index: this.index })
+      // 移动端组件点击自动置顶
+      this.mobileLayoutStatus && this.$store.commit('topComponent')
       eventsFor = events.mouse
       this.elementDown(e)
     },
@@ -998,12 +1006,19 @@ export default {
       const bounds = this.bounds
       const mouseClickPosition = this.mouseClickPosition
       // 水平移动
-      const tmpDeltaX = axis && axis !== 'y' ? mouseClickPosition.mouseX - (e.touches ? e.touches[0].pageX : e.pageX) : 0
+      const mX = e.touches ? e.touches[0].pageX : e.pageX
+      // 当前鼠标指针所在x位置
+      this.$store.commit('setMobileX', mX)
+      const tmpDeltaX = axis && axis !== 'y' ? mouseClickPosition.mouseX - mX : 0
       // 垂直移动
-      // 当前鼠标指针所在位置
-      const my = e.touches ? e.touches[0].pageY : e.pageY
-      this.$store.commit('setMobileY', my)
-      const tmpDeltaY = axis && axis !== 'x' ? mouseClickPosition.mouseY - my : 0
+      const mY = e.touches ? e.touches[0].pageY : e.pageY
+      // 当前鼠标指针所在y位置
+      this.$store.commit('setMobileY', mY)
+      // 如果是移动端布局触发mobileDragging
+      if (this.mobileLayoutStatus) {
+        this.$emit('mobileDragging', mY)
+      }
+      const tmpDeltaY = axis && axis !== 'x' ? mouseClickPosition.mouseY - mY : 0
       const [deltaX, deltaY] = snapToGrid(grid, tmpDeltaX, tmpDeltaY, this.scaleRatio)
       const left = restrictToBounds(mouseClickPosition.left - deltaX, bounds.minLeft, bounds.maxLeft)
       const top = restrictToBounds(mouseClickPosition.top - deltaY, bounds.minTop, bounds.maxTop)

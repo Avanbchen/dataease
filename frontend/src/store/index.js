@@ -100,7 +100,8 @@ const data = {
       y: 600
     },
     scrollAutoMove: 0,
-    mobileY: 0
+    mobileY: 0,
+    mobileX: 0
   },
   mutations: {
     ...animation.mutations,
@@ -379,6 +380,9 @@ const data = {
     },
     setMobileY(state, y) {
       state.mobileY = y
+    },
+    setMobileX(state, x) {
+      state.mobileX = x
     }
   },
   modules: {

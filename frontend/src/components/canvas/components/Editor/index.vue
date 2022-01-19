@@ -55,6 +55,7 @@
       @amRemoveItem="removeItem(item._dragId)"
       @amAddItem="addItemBox(item)"
       @linkJumpSet="linkJumpSet(item)"
+      @mobileDragging="mobileDragging"
     >
       <component
         :is="item.component"
@@ -1392,6 +1393,7 @@ export default {
       })(newX, oldX, newY, oldY, addSizex, addSizey), 10)
     },
     onDragging(e, item) {
+      this.$emit('onDragging', e, item)
       const infoBox = this.infoBox
       const moveItem = _.get(infoBox, 'moveItem')
       const vm = this
@@ -1532,6 +1534,9 @@ export default {
       _this.componentData.forEach(function(data, index) {
         _this.$refs.deDragRef && _this.$refs.deDragRef[index] && _this.$refs.deDragRef[index].checkParentSize()
       })
+    },
+    mobileDragging(mY) {
+      this.$emit('mobileDragging', mY)
     }
   }
 }

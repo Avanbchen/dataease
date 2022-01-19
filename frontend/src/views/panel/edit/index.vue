@@ -116,10 +116,7 @@
               @mousedown="handleMouseDown"
               @mouseup="deselectCurComponent"
             >
-              <el-row class="this_mobile_canvas_top" style="color: #FFFFFF">
-                <el-button @click.native="scrollMove">开始</el-button>
-                <el-button @click.native="destroyTimer">结束</el-button>
-              </el-row>
+              <el-row class="this_mobile_canvas_top" style="color: #FFFFFF" />
               <el-row class="this_mobile_canvas_inner_top">
                 {{ panelInfo.name }}
               </el-row>
@@ -129,7 +126,7 @@
                 :style="mobileCanvasStyle"
                 @scroll="canvasScroll"
               >
-                <Editor v-if="mobileEditorShow" id="editorMobile" ref="editorMobile" :matrix-count="mobileMatrixCount" :out-style="outStyle" :scroll-top="scrollTop" />
+                <Editor v-if="mobileEditorShow" id="editorMobile" ref="editorMobile" :matrix-count="mobileMatrixCount" :out-style="outStyle" :scroll-top="scrollTop" @mobileDragging="mobileDragging" />
               </div>
               <el-row class="this_mobile_canvas_inner_bottom">
                 <el-col :span="12">
@@ -318,7 +315,7 @@ export default {
       ],
       enableSureButton: false,
       filterFromDrag: false,
-      autoMoveOffSet: 10
+      autoMoveOffSet: 8
     }
   },
 
@@ -390,23 +387,22 @@ export default {
     },
     // 计算是否接触上下边界
     attackBoundary() {
-      let result = 'none'
-      const canvasTop = 150
-      const canvasHeight = 500
-      const canvasBottom = canvasTop + canvasHeight
-      // console.log('this.mobileY=' + this.mobileY)
-      if (this.curComponent && this.curComponent.optStatus.dragging) {
-        if (this.mobileY > canvasBottom) {
-          // 触底
-          result = 'toBottom'
-        } else if (this.mobileY < canvasTop) {
-          // 触顶
-          result = 'toTop'
-        } else {
-          result = 'none'
-        }
-        // console.log('result:' + result + ';curTop:' + this.mobileY + ';canvasBottom:' + canvasBottom + ';canvasBottom:' + canvasBottom + ';scrollTop:' + this.scrollTop + ';this.outStyle.height:' + this.outStyle.height)
-      }
+      const result = 'none'
+      // const canvasTop = 150
+      // const canvasHeight = 400
+      // const canvasBottom = canvasTop + canvasHeight
+      // if (this.curComponent && this.curComponent.optStatus.dragging) {
+      //   if (this.mobileY > canvasBottom) {
+      //     // 触底
+      //     result = 'toBottom'
+      //   } else if (this.mobileY < canvasTop) {
+      //     // 触顶
+      //     result = 'toTop'
+      //   } else {
+      //     result = 'none'
+      //   }
+      //   // console.log('result:' + result + ';curTop:' + this.mobileY + ';canvasBottom:' + canvasBottom + ';canvasBottom:' + canvasBottom + ';scrollTop:' + this.scrollTop + ';this.outStyle.height:' + this.outStyle.height)
+      // }
       return result
     },
     ...mapState([
@@ -452,14 +448,12 @@ export default {
       this.restore()
     },
     attackBoundary(value) {
-      // console.log('attackBoundary-watch:' + value)
-      // this.destroyTimer()
-      if (this.mobileLayoutStatus && this.curComponent && this.curComponent.optStatus.dragging && value !== 'none') {
-        const autoMoveOffSetExec = value === 'toBottom' ? this.autoMoveOffSet : -this.autoMoveOffSet
-        this.scrollMove(autoMoveOffSetExec)
-      } else {
-        this.destroyTimer()
-      }
+      // if (this.mobileLayoutStatus && this.curComponent && this.curComponent.optStatus.dragging && value !== 'none') {
+      //   const autoMoveOffSetExec = value === 'toBottom' ? this.autoMoveOffSet : -this.autoMoveOffSet
+      //   this.scrollMove(autoMoveOffSetExec)
+      // } else {
+      //   this.destroyTimer()
+      // }
     }
   },
   created() {
@@ -936,22 +930,35 @@ export default {
           console.log('触顶...')
           _this.destroyTimer()
         } else {
-          // console.log('offset...' + offset)
-          // 如果存在网页缩放，很有可能没有效果，但是else部分的代码会执行
-          // 原因：刚才讲到的scrollTop三个注意中标黄的一条
-          // 设置scrollTop的值小于0，即scrollTop被设为0
-          // 可以缩放跑一下，然后不刷新的状态下恢复百分之百跑一下，再缩放，打印scrollTop的值
-          // 你会发现正常尺寸执行时打印的第一个值不是加法，而是减法，即scrollTop++增加负值
-          // 这样的话就对应上了scrollTop的注意点了，增加的值小于0，就被设为0
           canvasInfoMobile.scrollTop = canvasInfoMobile.scrollTop + offset
           _this.$store.commit('setScrollAutoMove', _this.scrollAutoMove + offset)
         }
       }, 20)
     },
+    scrollMoveMobile(offset) {
+      const _this = this
+      // 获取父盒子（肯定有滚动条）
+      const canvasInfoMobile = document.getElementById('canvasInfoMobile')
+      canvasInfoMobile.scrollTop = canvasInfoMobile.scrollTop + offset
+      _this.$store.commit('setScrollAutoMove', _this.scrollAutoMove + offset)
+    },
     destroyTimer() {
       if (this.timer) {
         clearInterval(this.timer)
         this.timer = null
+      }
+    },
+    mobileDragging(mY) {
+      console.log('mY=' + mY)
+      if (this.curComponent && this.curComponent.optStatus.dragging) {
+        const canvasTop = 150
+        const canvasHeight = 400
+        const canvasBottom = canvasTop + canvasHeight
+        if (mY > canvasBottom) {
+          // 触底
+          const autoMoveOffSetExec = this.autoMoveOffSet
+          this.scrollMoveMobile(autoMoveOffSetExec)
+        }
       }
     }
 
