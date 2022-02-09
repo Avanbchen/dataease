@@ -32,6 +32,7 @@
       :search-count="searchCount"
       :h="config.style.height"
       :edit-mode="'preview'"
+      :filters="filters"
       :terminal="terminal"
     />
   </div>
@@ -74,6 +75,10 @@ export default {
     terminal: {
       type: String,
       default: 'pc'
+    },
+    filters: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
@@ -150,11 +155,7 @@ export default {
           height: '100%'
         }
       } else {
-        if (this.terminal === 'pc') {
-          return getStyle(style, ['top', 'left', 'width', 'height', 'rotate'])
-        } else {
-          return getStyle(style, ['top', 'left', 'width', 'height', 'rotate', 'fontSize'])
-        }
+        return getStyle(style, ['top', 'left', 'width', 'height', 'rotate'])
       }
     },
 

@@ -379,7 +379,7 @@ export default {
       taskFormRules: {
         name: [
           { required: true, message: this.$t('dataset.required'), trigger: 'change' },
-          { min: 2, max: 50, message: this.$t('datasource.input_limit_0_50', [2, 50]), trigger: 'blur' }
+          { min: 2, max: 50, message: this.$t('datasource.input_limit_2_50', [2, 50]), trigger: 'blur' }
         ],
         type: [
           { required: true, message: this.$t('dataset.required'), trigger: 'change' }
@@ -537,12 +537,19 @@ export default {
     getIncrementalConfig() {
       post('/dataset/table/incrementalConfig', { tableId: this.table.id }).then(response => {
         this.incrementalConfig = response.data
-        this.incrementalUpdateType = 'incrementalAdd'
-        if (this.incrementalConfig.incrementalAdd) {
+        if (this.incrementalConfig.incrementalAdd.length === 0 && this.incrementalConfig.incrementalDelete.length === 0 ) {
+          this.incrementalUpdateType = 'incrementalAdd'
+          this.sql = ''
+          return
+        }
+        if (this.incrementalConfig.incrementalAdd.length > 0) {
+          this.incrementalUpdateType = 'incrementalAdd'
           this.sql = this.incrementalConfig.incrementalAdd
         } else {
-          this.sql = ''
+          this.incrementalUpdateType = 'incrementalDelete'
+          this.sql = this.incrementalConfig.incrementalDelete
         }
+
       })
     },
     saveIncrementalConfig() {

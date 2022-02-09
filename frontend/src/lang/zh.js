@@ -131,6 +131,7 @@ export default {
     default_login: '普通登录'
   },
   commons: {
+    stop: '停止',
     first_login_tips: '您使用的是初始密码，记得修改密码哦',
     roger_that: '知道了',
     apply: '应用',
@@ -348,6 +349,8 @@ export default {
     ukey_title: 'API Keys',
     thumbnail: '缩略图',
     confirm_delete: '确认删除',
+    confirm_stop: '确认停止',
+    stop_success: '停止成功',
     treeselect: {
       no_children_text: '没有子节点',
       no_options_text: '没有可用选项',
@@ -1013,7 +1016,9 @@ export default {
     enum_exp: '字段枚举值',
     pls_slc: '请选择',
     filter_exp: '过滤值',
-    filter_type: '过滤方式'
+    filter_type: '过滤方式',
+    filter_value_can_not_str: '数值类型字段过滤值不能包含文本',
+    enum_value_can_not_null: '字段枚举值不能为空'
   },
   dataset: {
     sheet_warn: '有多个 Sheet 页，默认抽取第一个',
@@ -1268,7 +1273,7 @@ export default {
     delete_warning: '确定要删除吗?',
     input_name: '请输入名称',
     input_limit_2_25: '2-25字符',
-    input_limit_0_50: '0-50字符',
+    input_limit_2_50: '2-50字符',
     oracle_connection_type: '服务名/SID',
     oracle_sid: 'SID',
     oracle_service_name: '服务名',
@@ -1759,7 +1764,8 @@ export default {
     search_by_name: '根据名称搜索',
     exec_time: '执行时间',
     status: '执行状态',
-    pixel_error: '分辨率支持{800 - 10000} * {500 - 6250}'
+    pixel_error: '分辨率支持{800 - 10000} * {500 - 6250}',
+    next_exec_time: '下次执行时间'
 
   },
   emailtask: {
@@ -1813,7 +1819,7 @@ export default {
   dynamic_year: {
     fix: '固定年份',
     dynamic: '动态年份',
-    current: '当年',
+    current: '今年',
     last: '去年'
   },
   dynamic_month: {
@@ -1827,6 +1833,7 @@ export default {
     welcome_title: '欢迎使用DataEase',
     welcome_hint: '人人可用的开源数据可视化分析工具',
     demo_video: '演示视频',
+    quick_start: '快速入门',
     online_document: '在线文档',
     latest_developments: '最新动态',
     teaching_video: '教学视频',
@@ -1835,9 +1842,9 @@ export default {
     demo_video_hint: '如何3分钟制作一个DataEase 数据看板、并分享给他人',
     online_document_hint: '涵盖DataEase的安装步骤、用户手册、使用教程、常见问题的解决方案、以及二次开发等',
     teaching_video_bottom_hint: '更多视频资料',
-    enterprise_edition_hint1: '提供企业级应用场景X-Pack增强包',
+    enterprise_edition_hint1: '提供企业级应用场景 X-Pack 增强包',
     enterprise_edition_hint2: '提供高等级原厂服务支持',
-    enterprise_edition_hint3: '提供DataEase 运维安全最佳实践',
+    enterprise_edition_hint3: '提供 DataEase 最佳实践建议',
     open_source_community: '开源社区',
     click_show: '点击查看',
     show_more: '查看更多',

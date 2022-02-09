@@ -551,19 +551,23 @@
                     <color-selector :param="param" class="attr-selector" :chart="chart" @onColorChange="onColorChange" />
                   </el-collapse-item>
                   <el-collapse-item
-                    v-show="chart.type !== 'map' && chart.type !== 'waterfall' && chart.type !== 'word-cloud'"
+                    v-show="view.render && view.render === 'echarts' && chart.type !== 'map' && chart.type !== 'waterfall' && chart.type !== 'word-cloud'"
                     name="size"
                     :title="$t('chart.size')"
                   >
                     <size-selector
-                      v-if="view.render && view.render === 'echarts'"
                       :param="param"
                       class="attr-selector"
                       :chart="chart"
                       @onSizeChange="onSizeChange"
                     />
+                  </el-collapse-item>
+                  <el-collapse-item
+                    v-show="view.render && view.render === 'antv' && chart.type !== 'map' && chart.type !== 'waterfall' && chart.type !== 'word-cloud' && chart.type !== 'treemap'"
+                    name="size"
+                    :title="$t('chart.size')"
+                  >
                     <size-selector-ant-v
-                      v-else-if="view.render && view.render === 'antv'"
                       :param="param"
                       class="attr-selector"
                       :chart="chart"
@@ -1634,6 +1638,14 @@ export default {
           })
           return
         }
+        if (parseFloat(f.value).toString() === 'NaN') {
+          this.$message({
+            message: this.$t('chart.filter_value_can_not_str'),
+            type: 'error',
+            showClose: true
+          })
+          return
+        }
       }
       if (this.quotaItem.filterType === 'quota') {
         this.view.yaxis[this.quotaItem.index].filter = this.quotaItem.filter
@@ -1681,6 +1693,16 @@ export default {
               showClose: true
             })
             return
+          }
+          if (this.filterItem.deType === 2 || this.filterItem.deType === 3) {
+            if (parseFloat(f.value).toString() === 'NaN') {
+              this.$message({
+                message: this.$t('chart.filter_value_can_not_str'),
+                type: 'error',
+                showClose: true
+              })
+              return
+            }
           }
         }
       }
@@ -1838,29 +1860,29 @@ export default {
       }
     },
     addXaxis(e) {
-      if ((this.view.type === 'map' || this.view.type === 'word-cloud') && this.view.xaxis.length > 1) {
-        this.view.xaxis = [this.view.xaxis[0]]
-      }
       if (this.view.type !== 'table-info') {
         this.dragCheckType(this.view.xaxis, 'd')
       }
       this.dragMoveDuplicate(this.view.xaxis, e)
+      if ((this.view.type === 'map' || this.view.type === 'word-cloud') && this.view.xaxis.length > 1) {
+        this.view.xaxis = [this.view.xaxis[0]]
+      }
       this.calcData(true)
     },
     addYaxis(e) {
+      this.dragCheckType(this.view.yaxis, 'q')
+      this.dragMoveDuplicate(this.view.yaxis, e)
       if ((this.view.type === 'map' || this.view.type === 'waterfall' || this.view.type === 'word-cloud') && this.view.yaxis.length > 1) {
         this.view.yaxis = [this.view.yaxis[0]]
       }
-      this.dragCheckType(this.view.yaxis, 'q')
-      this.dragMoveDuplicate(this.view.yaxis, e)
       this.calcData(true)
     },
     addYaxisExt(e) {
+      this.dragCheckType(this.view.yaxisExt, 'q')
+      this.dragMoveDuplicate(this.view.yaxisExt, e)
       if (this.view.type === 'map' && this.view.yaxisExt.length > 1) {
         this.view.yaxisExt = [this.view.yaxisExt[0]]
       }
-      this.dragCheckType(this.view.yaxisExt, 'q')
-      this.dragMoveDuplicate(this.view.yaxisExt, e)
       this.calcData(true)
     },
     moveToDimension(e) {

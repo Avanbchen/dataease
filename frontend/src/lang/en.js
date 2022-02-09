@@ -131,6 +131,7 @@ export default {
     default_login: 'Normal'
   },
   commons: {
+    stop: 'Stop',
     first_login_tips: 'Please change the initial password',
     roger_that: 'Roger That',
     apply: 'Apply',
@@ -347,6 +348,8 @@ export default {
     ukey_title: 'API Keys',
     thumbnail: 'thumbnail',
     confirm_delete: 'Confirm delete',
+    confirm_stop: 'Confirm stop',
+    stop_success: 'Stop success',
     treeselect: {
       no_children_text: 'No sub-options.',
       no_options_text: 'No options available.',
@@ -1011,7 +1014,9 @@ export default {
     enum_exp: 'Enum',
     pls_slc: 'Please Select',
     filter_exp: 'Filter Value',
-    filter_type: 'Filter Type'
+    filter_type: 'Filter Type',
+    filter_value_can_not_str: 'Value type can not input string',
+    enum_value_can_not_null: 'Enum Value can not empty.'
   },
   dataset: {
     sheet_warn: 'There are multiple sheet pages, and the first one is extracted by default',
@@ -1263,7 +1268,7 @@ export default {
     delete_warning: 'Confirm to delete?',
     input_name: 'Please input name',
     input_limit_2_25: '2-25 chars',
-    input_limit_0_50: '0-50 chars',
+    input_limit_2_50: '2-50 chars',
     oracle_connection_type: 'Service Name/SID',
     oracle_sid: 'SID',
     oracle_service_name: 'Service Name',
@@ -1739,7 +1744,8 @@ export default {
     search_by_name: 'Search by name',
     exec_time: 'Execute time',
     status: 'Execute status',
-    pixel_error: 'Pixel only support {800 - 10000} * {500 - 6250}'
+    pixel_error: 'Pixel only support {800 - 10000} * {500 - 6250}',
+    next_exec_time: 'Next execute time'
 
   },
   emailtask: {
@@ -1808,6 +1814,7 @@ export default {
     welcome_title: 'Welcome To Use DataEase',
     welcome_hint: 'Open source data visual analysis tool available to everyone',
     demo_video: 'Demo',
+    quick_start: 'Quick Start',
     online_document: 'Online',
     latest_developments: 'Latest',
     teaching_video: 'Teaching',
@@ -1816,9 +1823,9 @@ export default {
     demo_video_hint: 'How to make a DataEase dashboard in 3 minutes and share it with others',
     online_document_hint: 'It covers the installation steps, user manuals, tutorials, solutions to common problems, and secondary development of DataEase',
     teaching_video_bottom_hint: 'More videos',
-    enterprise_edition_hint1: 'Provide enterprise application scenario x-pack enhancement package',
+    enterprise_edition_hint1: 'Provide enterprise application scenario X-Pack enhancement package',
     enterprise_edition_hint2: 'Provide high-level original factory service support',
-    enterprise_edition_hint3: 'Provide dataease O & M security best practices',
+    enterprise_edition_hint3: 'Provide DateEase best practice recommendations',
     open_source_community: 'Open source community',
     click_show: 'Click To View',
     show_more: 'Show More',

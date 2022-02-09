@@ -368,7 +368,7 @@ export default {
       }
 
       if (this.canvasStyleData.openCommonStyle) {
-        if (this.canvasStyleData.panel.backgroundType === 'image' && this.canvasStyleData.panel.imageUrl) {
+        if (this.canvasStyleData.panel.backgroundType === 'image' && typeof (this.canvasStyleData.panel.imageUrl) === 'string') {
           style = {
             background: `url(${this.canvasStyleData.panel.imageUrl}) no-repeat`,
             ...style
@@ -517,7 +517,7 @@ export default {
       })
     },
     initHasStar() {
-      starStatus(this.panelInfo.id, false).then(res => {
+      this.panelInfo && this.panelInfo.id && starStatus(this.panelInfo.id, false).then(res => {
         this.hasStar = res.data
       })
     },

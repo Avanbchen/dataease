@@ -75,13 +75,14 @@ public class ChartViewService {
         checkName(chartView);
         long timestamp = System.currentTimeMillis();
         chartView.setUpdateTime(timestamp);
-        int i = chartViewMapper.updateByPrimaryKeySelective(chartView);
-        if (i == 0) {
+        if (ObjectUtils.isEmpty(chartView.getId())) {
             chartView.setId(UUID.randomUUID().toString());
             chartView.setCreateBy(AuthUtils.getUser().getUsername());
             chartView.setCreateTime(timestamp);
             chartView.setUpdateTime(timestamp);
             chartViewMapper.insertSelective(chartView);
+        } else {
+            chartViewMapper.updateByPrimaryKeySelective(chartView);
         }
         Optional.ofNullable(chartView.getId()).ifPresent(id -> {
             CacheUtils.remove(JdbcConstants.VIEW_CACHE_KEY, id);
@@ -216,8 +217,10 @@ public class ChartViewService {
         if (ObjectUtils.isEmpty(view)) {
             throw new RuntimeException(Translator.get("i18n_chart_delete"));
         }
-        List<ChartViewFieldDTO> xAxis = new Gson().fromJson(view.getXAxis(), new TypeToken<List<ChartViewFieldDTO>>() {}.getType());
-        List<ChartViewFieldDTO> yAxis = new Gson().fromJson(view.getYAxis(), new TypeToken<List<ChartViewFieldDTO>>() {}.getType());
+        List<ChartViewFieldDTO> xAxis = new Gson().fromJson(view.getXAxis(), new TypeToken<List<ChartViewFieldDTO>>() {
+        }.getType());
+        List<ChartViewFieldDTO> yAxis = new Gson().fromJson(view.getYAxis(), new TypeToken<List<ChartViewFieldDTO>>() {
+        }.getType());
         if (StringUtils.equalsIgnoreCase(view.getType(), "chart-mix")) {
             List<ChartViewFieldDTO> yAxisExt = new Gson().fromJson(view.getYAxisExt(), new TypeToken<List<ChartViewFieldDTO>>() {
             }.getType());
@@ -242,6 +245,7 @@ public class ChartViewService {
         fields = permissionService.filterColumnPermissons(fields, desensitizationList, datasetTable.getId(), requestList.getUser());
         //将没有权限的列删掉
         List<String> dataeaseNames = fields.stream().map(DatasetTableField::getDataeaseName).collect(Collectors.toList());
+        dataeaseNames.add("*");
         fieldCustomFilter = fieldCustomFilter.stream().filter(item -> !desensitizationList.contains(item.getDataeaseName()) && dataeaseNames.contains(item.getDataeaseName())).collect(Collectors.toList());
         extStack = extStack.stream().filter(item -> !desensitizationList.contains(item.getDataeaseName()) && dataeaseNames.contains(item.getDataeaseName())).collect(Collectors.toList());
         extBubble = extBubble.stream().filter(item -> !desensitizationList.contains(item.getDataeaseName()) && dataeaseNames.contains(item.getDataeaseName())).collect(Collectors.toList());
@@ -301,14 +305,19 @@ public class ChartViewService {
                         filterRequest.setFieldId(fId);
 
                         DatasetTableField datasetTableField = dataSetTableFieldsService.get(fId);
-                        filterRequest.setDatasetTableField(datasetTableField);
-                        if (StringUtils.equalsIgnoreCase(datasetTableField.getTableId(), view.getTableId())) {
-                            if (CollectionUtils.isNotEmpty(filterRequest.getViewIds())) {
-                                if (filterRequest.getViewIds().contains(view.getId())) {
+                        if(datasetTableField == null){
+                            continue;
+                        }
+                        if(!desensitizationList.contains(datasetTableField.getDataeaseName()) && dataeaseNames.contains(datasetTableField.getDataeaseName())){
+                            filterRequest.setDatasetTableField(datasetTableField);
+                            if (StringUtils.equalsIgnoreCase(datasetTableField.getTableId(), view.getTableId())) {
+                                if (CollectionUtils.isNotEmpty(filterRequest.getViewIds())) {
+                                    if (filterRequest.getViewIds().contains(view.getId())) {
+                                        extFilterList.add(filterRequest);
+                                    }
+                                } else {
                                     extFilterList.add(filterRequest);
                                 }
-                            } else {
-                                extFilterList.add(filterRequest);
                             }
                         }
                     }
@@ -320,14 +329,16 @@ public class ChartViewService {
         if (ObjectUtils.isNotEmpty(requestList.getLinkageFilters())) {
             for (ChartExtFilterRequest request : requestList.getLinkageFilters()) {
                 DatasetTableField datasetTableField = dataSetTableFieldsService.get(request.getFieldId());
-                request.setDatasetTableField(datasetTableField);
-                if (StringUtils.equalsIgnoreCase(datasetTableField.getTableId(), view.getTableId())) {
-                    if (CollectionUtils.isNotEmpty(request.getViewIds())) {
-                        if (request.getViewIds().contains(view.getId())) {
+                if(!desensitizationList.contains(datasetTableField.getDataeaseName()) && dataeaseNames.contains(datasetTableField.getDataeaseName())){
+                    request.setDatasetTableField(datasetTableField);
+                    if (StringUtils.equalsIgnoreCase(datasetTableField.getTableId(), view.getTableId())) {
+                        if (CollectionUtils.isNotEmpty(request.getViewIds())) {
+                            if (request.getViewIds().contains(view.getId())) {
+                                extFilterList.add(request);
+                            }
+                        } else {
                             extFilterList.add(request);
                         }
-                    } else {
-                        extFilterList.add(request);
                     }
                 }
             }
